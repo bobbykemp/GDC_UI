@@ -8,9 +8,11 @@ public class CursorHandler : MonoBehaviour {
 	public CursorMode cursorMode = CursorMode.Auto;
 	public Vector2 hotSpot = Vector2.zero;
 	public GameObject other;
+	public GameObject player;
 	//Use raycasts to see what the pointer is hovering over in the GUI
 	Ray ray;
 	RaycastHit hit;
+	float dist;
 
 	//use to select which tag will cause a mouse cursor change
 	private string target_name = "Target";
@@ -27,11 +29,21 @@ public class CursorHandler : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		Cursor.SetCursor (null, hotSpot, cursorMode); 
 		if(Physics.Raycast(ray, out hit))
 		{
-			//Debug.Log (hit.collider.name);
-			if(hit.collider.gameObject.tag == target_name)
-			{ Cursor.SetCursor(cursorTexture, hotSpot, cursorMode); }
+			switch(hit.collider.gameObject.tag){
+			case("Target"):
+				Cursor.SetCursor (cursorTexture, hotSpot, cursorMode);
+				break;
+			case("Background"):
+				//Debug.Log(ray.origin);
+				break;
+			};
+				
 		}
+		dist = Vector3.Distance (ray.origin, player.transform.position);
+		Debug.Log (dist - 9.7f);
+		//Debug.Log(ray.origin);
 	}
 }
