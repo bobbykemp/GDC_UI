@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class CursorHandler : MonoBehaviour {
 
-	public Texture2D cursorTexture;
+	public Texture2D enemy;
+	public Texture2D talkable;
 	public CursorMode cursorMode = CursorMode.Auto;
 	public Vector2 hotSpot = Vector2.zero;
 	public GameObject other;
 	public GameObject player;
+	public bool can_melee;
+	public float max_melee_range = .6f;
+	public Enemy opponent;
 	//Use raycasts to see what the pointer is hovering over in the GUI
 	Ray ray;
 	RaycastHit hit;
@@ -18,7 +22,8 @@ public class CursorHandler : MonoBehaviour {
 	private string target_name = "Target";
 
 	void Start () {
-		
+		opponent = GameObject.FindGameObjectWithTag (target_name).GetComponent<Enemy> ();
+		opponent.SetCountText ();
 	}
 
 	//using a chain of else-ifs or a switch statement, multiple character types
@@ -34,16 +39,33 @@ public class CursorHandler : MonoBehaviour {
 		{
 			switch(hit.collider.gameObject.tag){
 			case("Target"):
-				Cursor.SetCursor (cursorTexture, hotSpot, cursorMode);
+				Cursor.SetCursor (enemy, hotSpot, cursorMode);
+				if (Input.GetMouseButtonDown (0)) {
+					Melee ();
+				}
 				break;
 			case("Background"):
 				//Debug.Log(ray.origin);
+				break;
+			case("talkable_npc"):
+				Cursor.SetCursor (talkable, hotSpot, cursorMode);
 				break;
 			};
 				
 		}
 		dist = Vector3.Distance (ray.origin, player.transform.position);
-		Debug.Log (dist - 9.7f);
-		//Debug.Log(ray.origin);
+		dist = dist - 9.7f;
+		//Debug.Log(dist);
+		if (dist > max_melee_range)
+			can_melee = false;
+		else {
+			can_melee = true;
+		}
+	}
+
+	void Melee(){
+		//if (can_melee) {
+			opponent.Damage (1);
+		//}
 	}
 }
